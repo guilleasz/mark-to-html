@@ -1,10 +1,10 @@
 # Mark To Html
 
-Simple Javascript Libary for turning Markdown to HTML
+Simple Javascript Library for turning Markdown to HTML
 
 ## Installation
 
-``` npm install mark-to-html```
+```$ npm install mark-to-html```
 
 
 ## Usage
