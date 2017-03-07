@@ -1,0 +1,24 @@
+{
+  "name": "mark-to-html",
+  "version": "1.0.1",
+  "description": "Simple Js libary to turn Markdown To Html",
+  "main": "dist/",
+  "scripts": {
+    "test": "mocha --compilers js:babel-core/register test*.js",
+    "build": "./node_modules/.bin/babel index.js --out-file dist/index.js && ./node_modules/.bin/babel decoders.js --out-file dist/decoders.js",
+    "start": "node ./dist/index.bundle.js"
+  },
+  "author": "Guille Aszyn <guilleaszyn@gmail.com>",
+  "license": "ISC",
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.23.1",
+    "babel-preset-env": "^1.2.1",
+    "chai": "^3.5.0"
+  }
+}
