@@ -1,6 +1,6 @@
 {
   "name": "mark-to-html",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Simple Js libary to turn Markdown To Html",
   "main": "dist/",
   "scripts": {
