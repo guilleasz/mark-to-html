@@ -11,7 +11,7 @@ function htmlEscape(str) {
 export function code(string) {
   const eString = htmlEscape(string);
   if (string.split('\n')[0].split(' ').length > 1 || string.split('\n').length < 2) {
-    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>').replace(/\t/g,  '<br>&ensp;');
+    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>').replace(/\t/g, '<br>&ensp;');
   }
   const arr = eString.split('```');
   arr[0] = `<pre><code class="${arr[1].split('\n')[0]}">`;
@@ -19,7 +19,7 @@ export function code(string) {
   arr[1][0] = '';
   arr[1] = arr[1].map(item => (!item ? '<br>' : item)).join('<br>');
   arr.push('</code></pre>');
-  return arr.join('').replace(/\t/g,  '<br>&ensp;');
+  return arr.join('').replace(/\t/g, '<br>&ensp;');
 }
 
 export function bold(string) {
@@ -88,6 +88,14 @@ export function inlines(string) {
   .join('');
 }
 
+
+function isASubOrderlist(string) {
+  return (string[0] === ' ' || string[0] === '\t') && Number(string[1]) && string[2] === '.' && string[3] === ' ';
+}
+function isASubUnorderlist(string) {
+  return (string[0] === ' ' || string[0] === '\t') && string[1] === '-' && string[2] === ' ';
+}
+
 export function header(string) {
   let h = 1;
   const arr = string.split('# ');
@@ -115,14 +123,14 @@ export function unorderList(string) {
       if (i > 1) arr[i - 1] += '</li>';
       arr[i] = arr[i].split(' ').slice(1).join(' ');
       arr[i] = `<li>${arr[i]}`;
-    } else if (arr[i][0] === ' ' && Number(arr[i][1]) && arr[i][2] === '.' && arr[i][3] === ' ') {
+    } else if (isASubOrderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (let j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += `\n${arr[j].slice(1)}`;
         arr[j] = '';
       }
       arr[i] = `${orderList(arr[i])}\n`;
-    } else if (arr[i][0] === ' ' && arr[i][1] === '-' && arr[i][2] === ' ') {
+    } else if (isASubUnorderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (let j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += `\n${arr[j].slice(1)}`;
@@ -136,12 +144,11 @@ export function unorderList(string) {
 }
 
 export function paragraph(string) {
-  if (string.slice(0,2) === '> ' ) {
+  if (string.slice(0, 2) === '> ') {
     return inlines(`<p class="blockquotes">${string.slice(2)}</p>`);
   }
   return inlines(`<p>${string}</p>`);
 }
-
 
 export function orderList(string) {
   const arr = string.split('\n');
@@ -152,14 +159,14 @@ export function orderList(string) {
       if (i > 1) arr[i - 1] += '</li>';
       arr[i] = arr[i].split(' ').slice(1).join(' ');
       arr[i] = `<li>${arr[i]}`;
-    } else if (arr[i][0] === ' ' && Number(arr[i][1]) && arr[i][2] === '.' && arr[i][3] === ' ') {
+    } else if (isASubOrderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (let j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += `\n${arr[j].slice(1)}`;
         arr[j] = '';
       }
       arr[i] = `${orderList(arr[i])}\n`;
-    } else if (arr[i][0] === ' ' && arr[i][1] === '-' && arr[i][2] === ' ') {
+    } else if (isASubUnorderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (let j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += `\n${arr[j].slice(1)}`;

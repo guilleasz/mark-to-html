@@ -94,6 +94,13 @@ function inlines(string) {
   }).join('');
 }
 
+function isASubOrderlist(string) {
+  return (string[0] === ' ' || string[0] === '\t') && Number(string[1]) && string[2] === '.' && string[3] === ' ';
+}
+function isASubUnorderlist(string) {
+  return (string[0] === ' ' || string[0] === '\t') && string[1] === '-' && string[2] === ' ';
+}
+
 function header(string) {
   var h = 1;
   var arr = string.split('# ');
@@ -121,14 +128,14 @@ function unorderList(string) {
       if (i > 1) arr[i - 1] += '</li>';
       arr[i] = arr[i].split(' ').slice(1).join(' ');
       arr[i] = '<li>' + arr[i];
-    } else if (arr[i][0] === ' ' && Number(arr[i][1]) && arr[i][2] === '.' && arr[i][3] === ' ') {
+    } else if (isASubOrderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (var j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += '\n' + arr[j].slice(1);
         arr[j] = '';
       }
       arr[i] = orderList(arr[i]) + '\n';
-    } else if (arr[i][0] === ' ' && arr[i][1] === '-' && arr[i][2] === ' ') {
+    } else if (isASubUnorderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (var _j = i + 1; arr[_j][0] === ' '; _j += 1) {
         arr[i] += '\n' + arr[_j].slice(1);
@@ -157,14 +164,14 @@ function orderList(string) {
       if (i > 1) arr[i - 1] += '</li>';
       arr[i] = arr[i].split(' ').slice(1).join(' ');
       arr[i] = '<li>' + arr[i];
-    } else if (arr[i][0] === ' ' && Number(arr[i][1]) && arr[i][2] === '.' && arr[i][3] === ' ') {
+    } else if (isASubOrderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (var j = i + 1; arr[j][0] === ' '; j += 1) {
         arr[i] += '\n' + arr[j].slice(1);
         arr[j] = '';
       }
       arr[i] = orderList(arr[i]) + '\n';
-    } else if (arr[i][0] === ' ' && arr[i][1] === '-' && arr[i][2] === ' ') {
+    } else if (isASubUnorderlist(arr[i])) {
       arr[i] = arr[i].slice(1);
       for (var _j2 = i + 1; arr[_j2][0] === ' '; _j2 += 1) {
         arr[i] += '\n' + arr[_j2].slice(1);
