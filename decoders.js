@@ -11,7 +11,7 @@ function htmlEscape(str) {
 export function code(string) {
   const eString = htmlEscape(string);
   if (string.split('\n')[0].split(' ').length > 1 || string.split('\n').length < 2) {
-    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>');
+    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>').replace(/\t/g,  '<br>&ensp');
   }
   const arr = eString.split('```');
   arr[0] = `<pre><code class="${arr[1].split('\n')[0]}">`;
