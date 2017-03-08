@@ -21,17 +21,17 @@ function htmlEscape(str) {
 function code(string) {
   var eString = htmlEscape(string);
   if (string.split('\n')[0].split(' ').length > 1 || string.split('\n').length < 2) {
-    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>');
+    return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>').replace(/\t/g, '<br>&ensp;');
   }
   var arr = eString.split('```');
   arr[0] = '<pre><code class="' + arr[1].split('\n')[0] + '">';
   arr[1] = arr[1].split('\n');
   arr[1][0] = '';
   arr[1] = arr[1].map(function (item) {
-    return !item ? '\n' : item;
-  }).join('');
+    return !item ? '<br>' : item;
+  }).join('<br>');
   arr.push('</code></pre>');
-  return arr.join('').replace(/\n/g, '<br>');
+  return arr.join('').replace(/\t/g, '<br>&ensp;');
 }
 
 function bold(string) {
