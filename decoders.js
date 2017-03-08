@@ -1,4 +1,6 @@
-function htmlEscape(str) {
+
+
+function htmlEscape(str) { // Encode Html
   return str
       .replace(/&/g, '&amp;')
       .replace(/"/g, '&quot;')
@@ -8,8 +10,8 @@ function htmlEscape(str) {
 }
 
 
-export function code(string) {
-  const eString = htmlEscape(string);
+export function code(string) { // generate <pre> and <code> tags
+  const eString = string;
   if (string.split('\n')[0].split(' ').length > 1 || string.split('\n').length < 2) {
     return eString.replace('```', '<code>').replace('```', '</code>').replace(/\n/g, '<br>').replace(/\t/g, '<br>&ensp;');
   }
@@ -22,23 +24,23 @@ export function code(string) {
   return arr.join('').replace(/\t/g, '<br>&ensp;');
 }
 
-export function bold(string) {
+export function bold(string) { // add Strong tag
   return `<strong>${string}</strong>`;
 }
 
-export function italic(string) {
+export function italic(string) { // add em tag
   return `<em>${string}</em>`;
 }
 
-export function image(string) {
+export function image(string) { // add img tag
   return `<img src="${string.split('(')[1].split(')')[0]}" alt="${string.split('[')[1].split(']')[0]}">`;
 }
 
-export function link(string) {
+export function link(string) { // add anchor tag
   return `<a href="${string.split('(')[1].split(')')[0]}">${string.split('[')[1].split(']')[0]}</a>`;
 }
 
-export function inlines(string) {
+export function inlines(string) { // detect inline elements
   return string
   .split('**')
   .map((item, i) => {
@@ -178,10 +180,20 @@ export function orderList(string) {
   arr[arr.length - 2] += '</li>';
   return inlines(arr.join('\n'));
 }
+function markdownEncode(string) {
+  return string.replace(/\\_/g, ';&us')
+  .replace(/\\\*/g, ';&str')
+  .replace(/\\`/g, ';&uptk');
+}
 
+function markdownDecode(string) {
+  return string.replace(/;&us/g, '_')
+  .replace(/;&str/g, '*')
+  .replace(/;&uptk/g, '`');
+}
 
 export function blocks(string) {
-  const arr = string.replace(/__/g, '**').replace(/_/g, '*').split('\n');
+  const arr = markdownEncode(htmlEscape(string)).replace(/^__|\b__|__\b/g, '**').replace(/^_|\b_|_\b/g, '*').split('\n');
   for (let i = 0; i < arr.length; i += 1) {
     if (arr[i][0] === '#') {
       arr[i] = `${header(arr[i])}\n`;
@@ -215,5 +227,5 @@ export function blocks(string) {
       arr[i] = `${paragraph(arr[i])}\n`;
     }
   }
-  return arr.join('');
+  return markdownDecode(arr.join(''));
 }

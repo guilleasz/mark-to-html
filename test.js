@@ -9,6 +9,11 @@ describe("Decoders", function(){
     chai.assert.equal(mkToHtml.fromfile(__dirname+"/test.md")+"\n",fs.readFileSync(__dirname+"/index.html", "utf-8") )
   })
   describe("Blocks", function(){
+    it("should detect escape characters in code", function() {
+      var string = 'h \\_chau \\*hola \\`chau'
+      chai.assert.equal(blocks(string), '<p>h _chau *hola `chau</p>\n')
+
+    })
     it("should detect several blocks and put them through correct fucntions", function(){
       var string = "# Hola\nComo estas\nYo estoy bien\n\nMe alegro\n1. hola\n2. chau\nhola\n\nchau"
       chai.assert.equal(blocks(string), '<h1>Hola</h1>\n<p>Como estas Yo estoy bien</p>\n<p>Me alegro</p>\n<ol>\n<li>hola</li>\n<li>chau\nhola</li>\n</ol>\n<p>chau</p>\n')
@@ -19,7 +24,15 @@ describe("Decoders", function(){
     })
     it('should detect code blocks', function(){
       var string = "```javascript\nvar a = 3\n```";
-      chai.assert.equal(blocks(string), '<pre><code class="javascript"><br>var a = 3<br></code></pre>\n')
+      chai.assert.equal(blocks(string), '<pre><code class="javascript"><br><br>var a = 3<br><br></code></pre>\n')
+    })
+    it("should change html escape characters,", function(){
+      var string = "<h1>"
+      chai.assert.equal(blocks(string), '<p>&lt;h1&gt;</p>\n')
+    })
+    it('should change __ to ** and _ to *', function(){
+      var string = "_hello_ __bye__";
+      chai.assert.equal(blocks(string), '<p><em>hello</em> <strong>bye</strong></p>\n');
     })
     describe('Headers', function() {
       it('should return a string with <h1> if has one #', function() {
@@ -85,8 +98,17 @@ describe("Decoders", function(){
         var string ="1. hola\n2. chau\n 1. hola";
         chai.assert.equal(orderList(string),'<ol>\n<li>hola</li>\n<li>chau\n<ol>\n<li>hola</li>\n</ol>\n</li>\n</ol>')
       })
+      it("should detect indented order list", function(){
+        var string ="1. hola\n2. chau\n\t1. hola";
+        chai.assert.equal(orderList(string),'<ol>\n<li>hola</li>\n<li>chau\n<ol>\n<li>hola</li>\n</ol>\n</li>\n</ol>')
+      })
+
       it("should detect indented unrder list", function(){
         var string ="1. hola\n2. chau\n - hola";
+        chai.assert.equal(orderList(string), '<ol>\n<li>hola</li>\n<li>chau\n<ul>\n<li>hola</li>\n</ul>\n</li>\n</ol>')
+      })
+      it("should detect indented unrder list", function(){
+        var string ="1. hola\n2. chau\n\t- hola";
         chai.assert.equal(orderList(string), '<ol>\n<li>hola</li>\n<li>chau\n<ul>\n<li>hola</li>\n</ul>\n</li>\n</ol>')
       })
     })
@@ -115,8 +137,16 @@ describe("Decoders", function(){
         var string ="- hola\n- chau\n 1. hola";
         chai.assert.equal(unorderList(string), '<ul>\n<li>hola</li>\n<li>chau\n<ol>\n<li>hola</li>\n</ol>\n</li>\n</ul>')
       })
+      it("should detect indented order list", function(){
+        var string ="- hola\n- chau\n\t1. hola";
+        chai.assert.equal(unorderList(string), '<ul>\n<li>hola</li>\n<li>chau\n<ol>\n<li>hola</li>\n</ol>\n</li>\n</ul>')
+      })
       it("should detect indented unorder list", function(){
         var string ="- hola\n- chau\n - hola";
+        chai.assert.equal(unorderList(string), '<ul>\n<li>hola</li>\n<li>chau\n<ul>\n<li>hola</li>\n</ul>\n</li>\n</ul>')
+      })
+      it("should detect indented unorder list", function(){
+        var string ="- hola\n- chau\n\t- hola";
         chai.assert.equal(unorderList(string), '<ul>\n<li>hola</li>\n<li>chau\n<ul>\n<li>hola</li>\n</ul>\n</li>\n</ul>')
       })
     })
@@ -169,7 +199,7 @@ describe("Decoders", function(){
     describe('Code', function(){
       it("should return a <pre><code> block when ``` and line space", function(){
         var string = "```\nhola\n```"
-        chai.assert.equal(code(string), '<pre><code class=""><br>hola<br></code></pre>')
+        chai.assert.equal(code(string), '<pre><code class=""><br><br>hola<br><br></code></pre>')
       })
       it("should return only a code block when no line jumps", function() {
         var string = '``` hola ```'
@@ -181,15 +211,11 @@ describe("Decoders", function(){
       })
       it("should add a class javascript when ```javascript and line space ", function(){
         var string = '```javascript\nvar a = 3\n```'
-        chai.assert.equal(code(string), '<pre><code class="javascript"><br>var a = 3<br></code></pre>')
+        chai.assert.equal(code(string), '<pre><code class="javascript"><br><br>var a = 3<br><br></code></pre>')
       })
       it("should add a class html when ```html and line space", function(){
         var string = '```html\nvar a = 3\n```'
-        chai.assert.equal(code(string), '<pre><code class="html"><br>var a = 3<br></code></pre>')
-      })
-      it("should encode html special characters", function(){
-        var string = '```\n<h1>"hola"</h1>\n```'
-        chai.assert.equal(code(string), '<pre><code class=""><br>&lt;h1&gt;&quot;hola&quot;&lt;/h1&gt;<br></code></pre>')
+        chai.assert.equal(code(string), '<pre><code class="html"><br><br>var a = 3<br><br></code></pre>')
       })
       it("should not encode html when ```html and no line space ", function() {
         var string = '```html hola\n```'
