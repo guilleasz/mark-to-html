@@ -136,6 +136,9 @@ export function unorderList(string) {
 }
 
 export function paragraph(string) {
+  if (string.slice(0,2) === '> ' ) {
+    return inlines(`<p class="blockquotes">${string.slice(2)}</p>`);
+  }
   return inlines(`<p>${string}</p>`);
 }
 
