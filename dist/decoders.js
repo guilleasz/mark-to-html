@@ -86,6 +86,11 @@ function inlines(string) {
       return code('```' + item + '```');
     }
     return item;
+  }).join('').split('`').map(function (item, i) {
+    if (i % 2 && i) {
+      return code('```' + item + '```');
+    }
+    return item;
   }).join('');
 }
 

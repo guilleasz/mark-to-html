@@ -77,6 +77,14 @@ export function inlines(string) {
     }
     return item;
   })
+  .join('')
+  .split('`')
+  .map((item, i) => {
+    if (i % 2 && i) {
+      return code(`\`\`\`${item}\`\`\``);
+    }
+    return item;
+  })
   .join('');
 }
 
